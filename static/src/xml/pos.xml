@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-extend="PosTicket">
+     <t t-jquery='.pos-sale-ticket' t-operation='replace'>
+            <div class="pos-sale-ticket">
+            <div class="pos-center-align"><h2><t t-esc="widget.pos.company.name"/></h2>
+            RTN: <t t-esc="widget.pos.company.vat || ''"/><br />
+            Phone: <t t-esc="widget.pos.company.phone || ''"/><br /><br />
+            </div>
+            Factura: <t t-esc="order.get('sequence_ref')"/><br />
+            Fecha de Factura: <t t-esc="moment().format('L LT')"/>
+             <t t-if="receipt.header">
+                <div style='text-align:left'>
+                    <t t-esc="receipt.header" />
+                </div>
+                <br />
+            </t>
+            <br />
+            
+            User: <t t-esc="widget.pos.cashier ? widget.pos.cashier.name : widget.pos.user.name"/><br />
+            <t t-if="widget.pos.get_client()">
+            Cliente: <t t-esc="widget.pos.get_client().name"/><br />
+            RTN: <t t-esc="widget.pos.get_client().vat"/><br />
+            <br />
+            </t>
+            <table class='receipt-orderlines'>
+                <colgroup>
+                    <col width='50%' />
+                    <col width='25%' />
+                    <col width='25%' />
+                </colgroup>
+                <tr t-foreach="orderlines" t-as="orderline">
+                    <td>
+                        <t t-esc="orderline.get_product().display_name"/>
+                         <t t-if="orderline.get_discount() > 0">
+                            <div class="pos-disc-font">
+                                With a <t t-esc="orderline.get_discount()"/>% discount
+                            </div>
+                        </t>
+                    </td>
+                    <td class="pos-right-align">
+                        <t t-esc="orderline.get_quantity_str_with_unit()"/>
+                    </td>
+                    <td class="pos-right-align">
+                        <t t-esc="widget.format_currency(orderline.get_display_price())"/>
+                    </td>
+                </tr>
+            </table>
+            <br />
+            <table class='receipt-total'>
+                <tr>
+                    <td>Subtotal:</td>
+                    <td class="pos-right-align">
+                        <t t-esc="widget.format_currency(order.get_total_without_tax())"/>
+                    </td>
+                </tr>
+                <t t-foreach="order.get_tax_details()" t-as="taxdetail">
+                    <tr>
+                        <td><t t-esc="taxdetail.name" /></td>
+                        <td class="pos-right-align">
+                            <t t-esc="widget.format_currency(taxdetail.amount)" />
+                        </td>
+                    </tr>
+                </t>
+                <tr>
+                    <td>Discount:</td>
+                    <td class="pos-right-align">
+                        <t t-esc="widget.format_currency(order.get_total_discount())"/>
+                    </td>
+                </tr>
+                <tr class="emph">
+                    <td>Total:</td>
+                    <td class="pos-right-align">
+                        <t t-esc="widget.format_currency(order.get_total_with_tax())"/>
+                    </td>
+                </tr>
+            </table>
+            <br />
+            <table class='receipt-paymentlines'>
+                <t t-foreach="paymentlines" t-as="line">
+                  <tr>
+                      <td>
+                          <t t-esc="line.name"/>
+                      </td>
+                      <td class="pos-right-align">
+                          <t t-esc="widget.format_currency(line.get_amount())"/>
+                      </td>
+                  </tr>
+                </t>
+            </table>
+            <br />
+            <table class='receipt-change'>
+                <tr><td>Change:</td><td class="pos-right-align">
+                    <t t-esc="widget.format_currency(order.get_change())"/>
+                    </td></tr>
+            </table>
+            <t t-if="receipt.footer">
+                <br />
+                <div style='text-align:center'>
+                    <t t-esc="receipt.footer" />
+                </div>
+            </t>
+        </div>
+     </t>
+        <!--<t t-jquery="[t-esc='order.name']"  t-operation="replace">
+            <br/>
+            Factura: <t t-esc="order.get('sequence_ref')"/>
+            <br/>
+        </t>-->
+
+    </t>
+
+    <t t-extend="XmlReceipt">
+        <t t-jquery="[t-if='!receipt.company.logo']" t-operation="after">
+            <br/>
+            <t t-esc="receipt.sequence_ref"/>
+            <br/>
+        </t>
+    </t>
+
+</templates>
